@@ -22,13 +22,23 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static com.mobsandgeeks.upi.UpiParam.ALL_PARAMETERS;
+import static com.mobsandgeeks.upi.UpiParam.AMOUNT;
+import static com.mobsandgeeks.upi.UpiParam.CURRENCY_CODE;
+import static com.mobsandgeeks.upi.UpiParam.MERCHANT_CODE;
+import static com.mobsandgeeks.upi.UpiParam.MINIMUM_AMOUNT;
+import static com.mobsandgeeks.upi.UpiParam.PAYEE_ADDRESS;
+import static com.mobsandgeeks.upi.UpiParam.PAYEE_NAME;
+import static com.mobsandgeeks.upi.UpiParam.REFERENCE_URL;
+import static com.mobsandgeeks.upi.UpiParam.TRANSACTION_ID;
+import static com.mobsandgeeks.upi.UpiParam.TRANSACTION_NOTE;
+import static com.mobsandgeeks.upi.UpiParam.TRANSACTION_REFERENCE_ID;
 
 /**
  * This class is useful to detect and handle UPI URIs and intents.
@@ -90,8 +100,8 @@ public class UpiDelegate {
         Uri upiUri = upiIntent.getData();
 
         // Mandatory fields
-        String payeeName = upiUri.getQueryParameter(UpiParam.PAYEE_NAME);
-        String payeeAddress = upiUri.getQueryParameter(UpiParam.PAYEE_ADDRESS);
+        String payeeName = upiUri.getQueryParameter(PAYEE_NAME);
+        String payeeAddress = upiUri.getQueryParameter(PAYEE_ADDRESS);
 
         // Check for missing mandatory fields and throw an error
         @UpiError int error = -1;
@@ -114,40 +124,34 @@ public class UpiDelegate {
     }
 
     private UpiPayload getPayload(Uri upiUri, UpiPayload.Builder builder) {
-        return builder.transactionReferenceId(upiUri.getQueryParameter(UpiParam.TRANSACTION_REFERENCE_ID))
-                .merchantCode(upiUri.getQueryParameter(UpiParam.MERCHANT_CODE))
-                .transactionId(upiUri.getQueryParameter(UpiParam.TRANSACTION_ID))
-                .transactionNote(upiUri.getQueryParameter(UpiParam.TRANSACTION_NOTE))
-                .currencyCode(upiUri.getQueryParameter(UpiParam.CURRENCY_CODE))
-                .referenceUrl(upiUri.getQueryParameter(UpiParam.REFERENCE_URL))
-                .payeeAmount(toBigDecimal(upiUri.getQueryParameter(UpiParam.AMOUNT)))
-                .minimumAmount(toBigDecimal(upiUri.getQueryParameter(UpiParam.MINIMUM_AMOUNT)))
+        return builder.transactionReferenceId(upiUri.getQueryParameter(TRANSACTION_REFERENCE_ID))
+                .merchantCode(upiUri.getQueryParameter(MERCHANT_CODE))
+                .transactionId(upiUri.getQueryParameter(TRANSACTION_ID))
+                .transactionNote(upiUri.getQueryParameter(TRANSACTION_NOTE))
+                .currencyCode(upiUri.getQueryParameter(CURRENCY_CODE))
+                .referenceUrl(upiUri.getQueryParameter(REFERENCE_URL))
+                .payeeAmount(toBigDecimal(upiUri.getQueryParameter(AMOUNT)))
+                .minimumAmount(toBigDecimal(upiUri.getQueryParameter(MINIMUM_AMOUNT)))
                 .build();
     }
 
     @Nullable
     private Map<String, String> getExtras(Uri upiUri) {
-        final List<String> upiParams = Arrays.asList(
-                UpiParam.AMOUNT, UpiParam.CURRENCY_CODE, UpiParam.MERCHANT_CODE,
-                UpiParam.MINIMUM_AMOUNT, UpiParam.PAYEE_ADDRESS, UpiParam.PAYEE_NAME,
-                UpiParam.REFERENCE_URL, UpiParam.TRANSACTION_ID, UpiParam.TRANSACTION_NOTE,
-                UpiParam.TRANSACTION_REFERENCE_ID
-        );
-
-        Map<String, String> extras = null;
         Set<String> queryParameterNames = new HashSet<>(upiUri.getQueryParameterNames());
-        for (int i = 0, n = upiParams.size(); i < n; i++) {
-            queryParameterNames.remove(upiParams.get(i));
-        }
+        queryParameterNames.removeAll(ALL_PARAMETERS);
 
+        Map<String, String> extras;
         if (queryParameterNames.size() > 0) {
             extras = new HashMap<>();
             for (String name : queryParameterNames) {
                 extras.put(name, upiUri.getQueryParameter(name));
             }
+            extras = Collections.unmodifiableMap(extras);
+        } else {
+            extras = Collections.emptyMap();
         }
 
-        return extras != null ? Collections.unmodifiableMap(extras) : null;
+        return extras;
     }
 
     @Nullable

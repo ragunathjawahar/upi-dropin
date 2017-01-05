@@ -14,27 +14,42 @@
 
 package com.mobsandgeeks.upi;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
- * An interface with constants that are defined in the
+ * A class with constants that are defined in the
  * <a href="http://www.npci.org.in/documents/UPI-Linking-Specs-ver-1.1_draft.pdf">UPI Linking
  * Specifications Version 1.1 (Draft)</a>.
  */
-interface UpiParam {
+final class UpiParam {
 
     // Mandatory fields
-    String PAYEE_ADDRESS = "pa";
-    String PAYEE_NAME = "pn";
+    static final String PAYEE_ADDRESS = "pa";
+    static final String PAYEE_NAME = "pn";
 
     // Conditional
-    String TRANSACTION_REFERENCE_ID = "tr";
+    static final String TRANSACTION_REFERENCE_ID = "tr";
 
     // Optional
-    String AMOUNT = "am";
-    String MINIMUM_AMOUNT = "mam";
-    String MERCHANT_CODE = "mc";
-    String TRANSACTION_ID = "tid";
-    String TRANSACTION_NOTE = "tn";
-    String CURRENCY_CODE = "cu";
-    String REFERENCE_URL = "url";
+    static final String AMOUNT = "am";
+    static final String MINIMUM_AMOUNT = "mam";
+    static final String MERCHANT_CODE = "mc";
+    static final String TRANSACTION_ID = "tid";
+    static final String TRANSACTION_NOTE = "tn";
+    static final String CURRENCY_CODE = "cu";
+    static final String REFERENCE_URL = "url";
+
+    /**
+     * List of all UPI parameters.
+     */
+    static final List<String> ALL_PARAMETERS = Arrays.asList(
+            UpiParam.AMOUNT, UpiParam.CURRENCY_CODE, UpiParam.MERCHANT_CODE,
+            UpiParam.MINIMUM_AMOUNT, UpiParam.PAYEE_ADDRESS, UpiParam.PAYEE_NAME,
+            UpiParam.REFERENCE_URL, UpiParam.TRANSACTION_ID, UpiParam.TRANSACTION_NOTE,
+            UpiParam.TRANSACTION_REFERENCE_ID
+    );
+
+    private UpiParam() { /* No instances. */ }
 
 }
