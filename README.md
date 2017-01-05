@@ -7,44 +7,45 @@ The purpose of this SDK is to have as many eye-balls as possible to audit and im
 Usage
 -----
 1. In your `AndroidManifest.xml`, add an intent filter to the `Activity` in which you want to handle UPI intents.
+````xml
+<activity android:name=".UpiPaymentActivity">
 
-    <activity android:name=".UpiPaymentActivity">
+    <!-- Intent Filter for UPI URIs -->
+    <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
 
-        <!-- Intent Filter for UPI URIs -->
-        <intent-filter>
-            <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
 
-            <category android:name="android.intent.category.DEFAULT" />
-            <category android:name="android.intent.category.BROWSABLE" />
-
-            <data android:scheme="upi" android:pathPattern=".*" />
-        </intent-filter>
-    </activity>
+        <data android:scheme="upi" android:pathPattern=".*" />
+    </intent-filter>
+</activity>
+````
 
 2. Implement `UpiCallback` and handle incoming intents in your `Activity`.
+````java
+public class UpiPaymentActivity extends AppCompatActivity implements UpiCallback {
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        // More code…
 
-    public class UpiPaymentActivity extends AppCompatActivity implements UpiCallback {
-
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            // More code…
-
-            if (UpiDelegate.isUpiIntent(getIntent())) {
-                new UpiDelegate().handle(getIntent(), this);
-            }
-        }
-
-        @Override
-        public void onSuccess(UpiPayload payload, Map<String, String> extras, Uri upiUri) {
-            // Success callback…
-        }
-
-        @Override
-        public void onFailure(@UpiError int errorCode, Uri upiUri) {
-            // Failure callback…
+        if (UpiDelegate.isUpiIntent(getIntent())) {
+            new UpiDelegate().handle(getIntent(), this);
         }
     }
+
+    @Override
+    public void onSuccess(UpiPayload payload, Map<String, String> extras, Uri upiUri) {
+        // Success callback…
+    }
+
+    @Override
+    public void onFailure(@UpiError int errorCode, Uri upiUri) {
+        // Failure callback…
+    }
+}
+````
 
 License
 -------
